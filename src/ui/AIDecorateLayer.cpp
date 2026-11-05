@@ -2,13 +2,13 @@
 #include "../presets/AIPresetManager.hpp"
 #include <Geode/Geode.hpp>
 
-using namespace geode::preload;
+using namespace geode::prelude;
 
 namespace AutoDecoratorAI {
 
-AIDecorateLayer* AIDecorateLayer::create(EditorUI* editorUI) {
+AIDecorateLayer* AIDecorateLayer::create(EditorUI* editorUI, LevelEditorLayer* editorLayer) {
     auto ret = new AIDecorateLayer();
-    if (ret && ret->init(editorUI)) {
+    if (ret && ret->init(editorUI, editorLayer)) {
         ret->autorelease();
         return ret;
     }
@@ -16,12 +16,13 @@ AIDecorateLayer* AIDecorateLayer::create(EditorUI* editorUI) {
     return nullptr;
 }
 
-bool AIDecorateLayer::init(EditorUI* editorUI) {
+bool AIDecorateLayer::init(EditorUI* editorUI, LevelEditorLayer* editorLayer) {
     if (!CCLayer::init()) {
         return false;
     }
     
     m_editorUI = editorUI;
+    m_editorLayer = editorLayer;
     m_decorationEngine = AIDecorationEngine::get();
     m_isVisible = false;
     m_currentPreset = nullptr;
@@ -461,7 +462,7 @@ void AIDecorateLayer::onApply(CCObject* sender) {
     }
     
     // Apply to level
-    m_decorationEngine->applyDecorationsToLevel(placements, m_editorUI);
+    m_decorationEngine->applyDecorationsToLevel(placements, m_editorLayer);
     
     // Hide progress display
     m_progressLabel->setVisible(false);
@@ -471,7 +472,7 @@ void AIDecorateLayer::onApply(CCObject* sender) {
 }
 
 void AIDecorateLayer::onSavePreset(CCObject* sender) {
-    auto input = TextInput::create("Preset Name", "Enter preset name");
+    auto input = TextInput::create(220.f, "Enter preset name");
     input->setCallback([this](const std::string& name) {
         if (name.empty()) return;
         
@@ -540,23 +541,15 @@ void AIDecorateLayer::onAntiClutterChanged(CCObject* sender) {
 
 std::vector<geode::Ref<GameObject>> AIDecorateLayer::getSelectedObjects() {
     std::vector<geode::Ref<GameObject>> selectedObjects;
-    
-    if (!m_editorUI) {
-        return selectedObjects;
-    }
-    
-    // Geometry Dash 2.2081 stores the current selection on EditorUI.
-    auto selected = m_editorUI->m_selectedObjects;
-    if (!selected) {
-        return selectedObjects;
-    }
+    if (!m_editorUI) return selectedObjects;
 
-    CCObject* item = nullptr;
-    CCARRAY_FOREACH(selected, item) {
-        if (auto obj = typeinfo_cast<GameObject*>(item)) {
-            selectedObjects.emplace_back(obj);
-        }
-    }    
+    // Geode 5 exposes the current selection through EditorUI.
+    auto selected = m_editorUI->getSelectedObjects();
+    if (!selected) return selectedObjects;
+
+    for (auto* object : CCArrayExt<GameObject*>(selected)) {
+        if (object) selectedObjects.emplace_back(object);
+    }
     return selectedObjects;
 }
 
