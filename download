@@ -1,0 +1,7 @@
+build/
+cmake-build-*/
+*.dll
+*.so
+*.geode
+.vs/
+.vscode/
