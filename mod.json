@@ -1,6 +1,6 @@
 
 {
-    "geode": "2.0.0",
+    "geode": ">=5.0.0",
     "gd": {
         "android": "2.2081"
     },
@@ -8,28 +8,11 @@
     "id": "autodecoratorai.reid",
     "name": "Auto Decorator AI",
     "developer": "Reid",
-    "description": "AI-powered automatic level decoration for Geometry Dash Android.",
-    "repository": "https://github.com/reid/autodecoratorai",
+    "description": "AI automatic level decoration for Geometry Dash Android",
     "dependencies": [
         {
-            "id": "geode",
-            "version": ">=2.0.0"
+            "id": "geode.node-ids",
+            "version": "*"
         }
-    ],
-    "settings": {
-        "default-density": {
-            "type": "float",
-            "default": 0.5,
-            "min": 0.0,
-            "max": 1.0,
-            "name": "Default Decoration Density"
-        },
-        "default-chaos": {
-            "type": "float",
-            "default": 0.3,
-            "min": 0.0,
-            "max": 1.0,
-            "name": "Default Chaos Factor"
-        }
-    }
+    ]
 }
