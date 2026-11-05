@@ -25,7 +25,7 @@ public:
         float detailOverride = -1.0f
     );
     
-    void applyDecorationsToLevel(const std::vector<DecorationPlacement>& placements, LevelEditorLayer* editorLayer);
+    void applyDecorationsToLevel(const std::vector<DecorationPlacement>& placements, EditorUI* editorUI);
     
     void setProgressCallback(std::function<void(const std::string&, float)> callback);
     
