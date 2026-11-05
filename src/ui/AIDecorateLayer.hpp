@@ -1,9 +1,9 @@
-
 #pragma once
 
 #include <Geode/Geode.hpp>
 #include "../presets/AIPresetData.hpp"
 #include "../engine/AIDecorationEngine.hpp"
+
 #include <vector>
 
 using namespace geode::prelude;
@@ -13,7 +13,8 @@ namespace AutoDecoratorAI {
 class AIDecorateLayer : public cocos2d::CCLayer {
 public:
     static AIDecorateLayer* create(
-        EditorUI* editorUI
+        EditorUI* editorUI,
+        LevelEditorLayer* editorLayer
     );
 
     void updatePresetDropdown();
@@ -24,37 +25,46 @@ public:
     );
 
 private:
-    bool init(EditorUI* editorUI);
+    bool init(
+        EditorUI* editorUI,
+        LevelEditorLayer* editorLayer
+    );
 
-    EditorUI* m_editorUI;
-    AIDecorationEngine* m_decorationEngine;
+    EditorUI* m_editorUI = nullptr;
+    LevelEditorLayer* m_editorLayer = nullptr;
 
-    CCMenuItemSpriteExtra* m_toggleButton;
-    CCMenu* m_mainMenu;
-    CCNode* m_overlayPanel;
+    AIDecorationEngine* m_decorationEngine = nullptr;
 
-    CCMenuItemToggler* m_edgeEmphasisToggle;
-    CCMenuItemToggler* m_flowFollowingToggle;
-    CCMenuItemToggler* m_symmetryMirroringToggle;
-    CCMenuItemToggler* m_antiClutterToggle;
+    CCMenuItemSpriteExtra* m_toggleButton = nullptr;
+    CCMenu* m_mainMenu = nullptr;
 
-    Slider* m_densitySlider;
-    Slider* m_chaosSlider;
-    Slider* m_symmetrySlider;
-    Slider* m_detailSlider;
+    CCScale9Sprite* m_overlayPanel = nullptr;
 
-    CCLabelBMFont* m_presetLabel;
-    CCMenu* m_presetMenu;
+    CCMenuItemToggler* m_edgeEmphasisToggle = nullptr;
+    CCMenuItemToggler* m_flowFollowingToggle = nullptr;
+    CCMenuItemToggler* m_symmetryMirroringToggle = nullptr;
+    CCMenuItemToggler* m_antiClutterToggle = nullptr;
 
-    CCMenuItemSpriteExtra* m_analyzeButton;
-    CCMenuItemSpriteExtra* m_applyButton;
-    CCMenuItemSpriteExtra* m_savePresetButton;
+    Slider* m_densitySlider = nullptr;
+    Slider* m_chaosSlider = nullptr;
+    Slider* m_symmetrySlider = nullptr;
+    Slider* m_detailSlider = nullptr;
 
-    CCLabelBMFont* m_progressLabel;
-    CCProgressTimer* m_progressBar;
+    CCLabelBMFont* m_presetLabel = nullptr;
+    CCMenu* m_presetMenu = nullptr;
 
-    bool m_isVisible;
-    AIPreset* m_currentPreset;
+    CCMenuItemSpriteExtra* m_analyzeButton = nullptr;
+    CCMenuItemSpriteExtra* m_applyButton = nullptr;
+    CCMenuItemSpriteExtra* m_savePresetButton = nullptr;
+    CCMenuItemSpriteExtra* m_confirmSavePresetButton = nullptr;
+
+    TextInput* m_presetNameInput = nullptr;
+
+    CCLabelBMFont* m_progressLabel = nullptr;
+    CCProgressTimer* m_progressBar = nullptr;
+
+    bool m_isVisible = false;
+    AIPreset* m_currentPreset = nullptr;
 
     std::vector<AIPreset> m_availablePresets;
 
@@ -63,6 +73,7 @@ private:
     void onAnalyze(CCObject* sender);
     void onApply(CCObject* sender);
     void onSavePreset(CCObject* sender);
+    void onConfirmSavePreset(CCObject* sender);
 
     void onDensityChanged(CCObject* sender);
     void onChaosChanged(CCObject* sender);
