@@ -6,9 +6,9 @@ using namespace geode::preload;
 
 namespace AutoDecoratorAI {
 
-AIDecorateLayer* AIDecorateLayer::create(EditorUI* editorUI) {
+AIDecorateLayer* AIDecorateLayer::create(EditorUI* editorUI, LevelEditorLayer* editorLayer) {
     auto ret = new AIDecorateLayer();
-    if (ret && ret->init(editorUI)) {
+    if (ret && ret->init(editorUI, editorLayer)) {
         ret->autorelease();
         return ret;
     }
@@ -16,12 +16,13 @@ AIDecorateLayer* AIDecorateLayer::create(EditorUI* editorUI) {
     return nullptr;
 }
 
-bool AIDecorateLayer::init(EditorUI* editorUI) {
+bool AIDecorateLayer::init(EditorUI* editorUI, LevelEditorLayer* editorLayer) {
     if (!CCLayer::init()) {
         return false;
     }
     
     m_editorUI = editorUI;
+    m_editorLayer = editorLayer;
     m_decorationEngine = AIDecorationEngine::get();
     m_isVisible = false;
     m_currentPreset = nullptr;
@@ -461,7 +462,7 @@ void AIDecorateLayer::onApply(CCObject* sender) {
     }
     
     // Apply to level
-    m_decorationEngine->applyDecorationsToLevel(placements, m_editorUI);
+    m_decorationEngine->applyDecorationsToLevel(placements, m_editorLayer);
     
     // Hide progress display
     m_progressLabel->setVisible(false);
@@ -540,22 +541,16 @@ void AIDecorateLayer::onAntiClutterChanged(CCObject* sender) {
 
 std::vector<geode::Ref<GameObject>> AIDecorateLayer::getSelectedObjects() {
     std::vector<geode::Ref<GameObject>> selectedObjects;
-    
-    if (!m_editorUI) {
+
+    if (!m_editorLayer) {
         return selectedObjects;
     }
-    
-    auto editorLayer = m_editorUI->getEditorLayer();
-    if (!editorLayer) {
-        return selectedObjects;
+
+    auto selected = m_editorLayer->getSelectedObjects();
+    for (auto object : selected) {
+        selectedObjects.push_back(object);
     }
-    
-    // Get selected objects from editor
-    auto selected = editorLayer->getSelectedObjects();
-    for (auto obj : selected) {
-        selectedObjects.push_back(obj);
-    }
-    
+
     return selectedObjects;
 }
 
