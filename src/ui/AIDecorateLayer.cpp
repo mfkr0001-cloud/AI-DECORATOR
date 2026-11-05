@@ -6,9 +6,9 @@ using namespace geode::preload;
 
 namespace AutoDecoratorAI {
 
-AIDecorateLayer* AIDecorateLayer::create(EditorUI* editorUI, LevelEditorLayer* editorLayer) {
+AIDecorateLayer* AIDecorateLayer::create(EditorUI* editorUI) {
     auto ret = new AIDecorateLayer();
-    if (ret && ret->init(editorUI, editorLayer)) {
+    if (ret && ret->init(editorUI)) {
         ret->autorelease();
         return ret;
     }
@@ -16,13 +16,12 @@ AIDecorateLayer* AIDecorateLayer::create(EditorUI* editorUI, LevelEditorLayer* e
     return nullptr;
 }
 
-bool AIDecorateLayer::init(EditorUI* editorUI, LevelEditorLayer* editorLayer) {
+bool AIDecorateLayer::init(EditorUI* editorUI) {
     if (!CCLayer::init()) {
         return false;
     }
     
     m_editorUI = editorUI;
-    m_editorLayer = editorLayer;
     m_decorationEngine = AIDecorationEngine::get();
     m_isVisible = false;
     m_currentPreset = nullptr;
@@ -462,7 +461,7 @@ void AIDecorateLayer::onApply(CCObject* sender) {
     }
     
     // Apply to level
-    m_decorationEngine->applyDecorationsToLevel(placements, m_editorLayer);
+    m_decorationEngine->applyDecorationsToLevel(placements, m_editorUI);
     
     // Hide progress display
     m_progressLabel->setVisible(false);
@@ -541,16 +540,23 @@ void AIDecorateLayer::onAntiClutterChanged(CCObject* sender) {
 
 std::vector<geode::Ref<GameObject>> AIDecorateLayer::getSelectedObjects() {
     std::vector<geode::Ref<GameObject>> selectedObjects;
-
-    if (!m_editorLayer) {
+    
+    if (!m_editorUI) {
+        return selectedObjects;
+    }
+    
+    // Geometry Dash 2.2081 stores the current selection on EditorUI.
+    auto selected = m_editorUI->m_selectedObjects;
+    if (!selected) {
         return selectedObjects;
     }
 
-    auto selected = m_editorLayer->getSelectedObjects();
-    for (auto object : selected) {
-        selectedObjects.push_back(object);
-    }
-
+    CCObject* item = nullptr;
+    CCARRAY_FOREACH(selected, item) {
+        if (auto obj = typeinfo_cast<GameObject*>(item)) {
+            selectedObjects.emplace_back(obj);
+        }
+    }    
     return selectedObjects;
 }
 
