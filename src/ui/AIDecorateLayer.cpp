@@ -462,7 +462,7 @@ void AIDecorateLayer::onApply(CCObject* sender) {
     }
     
     // Apply to level
-    m_decorationEngine->applyDecorationsToLevel(placements, m_editorLayer);
+    m_decorationEngine->applyDecorationsToLevel(placements, m_editorUI);
     
     // Hide progress display
     m_progressLabel->setVisible(false);
@@ -472,39 +472,85 @@ void AIDecorateLayer::onApply(CCObject* sender) {
 }
 
 void AIDecorateLayer::onSavePreset(CCObject* sender) {
-    auto input = TextInput::create(220.f, "Enter preset name");
-    input->setCallback([this](const std::string& name) {
-        if (name.empty()) return;
-        
-        auto presetManager = AIPresetManager::get();
-        auto newPreset = presetManager->createCustomPreset(name, "Custom user preset");
-        
-        // Copy current settings
-        if (m_currentPreset) {
-            newPreset.styleBias = m_currentPreset->styleBias;
-            newPreset.decorationPool = m_currentPreset->decorationPool;
-            newPreset.styleWeights = m_currentPreset->styleWeights;
-        }
-        
-        newPreset.edgeEmphasis = m_edgeEmphasisToggle->isToggled();
-        newPreset.flowFollowing = m_flowFollowingToggle->isToggled();
-        newPreset.symmetryMirroring = m_symmetryMirroringToggle->isToggled();
-        newPreset.antiClutterMode = m_antiClutterToggle->isToggled();
-        newPreset.chaosTolerance = m_chaosSlider->getValue();
-        newPreset.symmetryPreference = m_symmetrySlider->getValue();
-        newPreset.microDetailLevel = m_detailSlider->getValue();
-        
-        presetManager->addPreset(newPreset);
-        presetManager->saveCustomPresets();
-        
-        // Refresh preset list
-        m_availablePresets = presetManager->getAllPresets();
-        updatePresetDropdown();
-        
-        FLAlertLayer::create("Success", "Preset saved successfully!", "OK")->show();
-    });
-    
-    input->show();
+    if (!m_overlayPanel || !m_mainMenu) {
+        return;
+    }
+
+    if (m_presetNameInput) {
+        m_presetNameInput->removeFromParent();
+        m_presetNameInput = nullptr;
+    }
+    if (m_confirmSavePresetButton) {
+        m_confirmSavePresetButton->removeFromParent();
+        m_confirmSavePresetButton = nullptr;
+    }
+
+    // TextInput::setCallback is a text-change callback, not a submit event.
+    // Keep the input open and save only after the user presses the Save button.
+    m_presetNameInput = TextInput::create(220.f, "Enter preset name");
+    if (!m_presetNameInput) {
+        return;
+    }
+
+    auto panelSize = m_overlayPanel->getContentSize();
+    m_presetNameInput->setPosition(panelSize.width / 2, panelSize.height / 2 + 15.f);
+    m_overlayPanel->addChild(m_presetNameInput, 1000);
+
+    auto saveSprite = ButtonSprite::create("Save preset");
+    m_confirmSavePresetButton = CCMenuItemSpriteExtra::create(
+        saveSprite,
+        this,
+        menu_selector(AIDecorateLayer::onConfirmSavePreset)
+    );
+    m_confirmSavePresetButton->setPosition(panelSize.width / 2, panelSize.height / 2 - 35.f);
+    m_mainMenu->addChild(m_confirmSavePresetButton, 1001);
+
+    m_presetNameInput->focus();
+}
+
+void AIDecorateLayer::onConfirmSavePreset(CCObject* sender) {
+    if (!m_presetNameInput) {
+        return;
+    }
+
+    auto name = m_presetNameInput->getString();
+    if (name.empty()) {
+        FLAlertLayer::create("Preset name", "Enter a name before saving.", "OK")->show();
+        return;
+    }
+
+    auto presetManager = AIPresetManager::get();
+    auto newPreset = presetManager->createCustomPreset(name, "Custom user preset");
+
+    if (m_currentPreset) {
+        newPreset.styleBias = m_currentPreset->styleBias;
+        newPreset.decorationPool = m_currentPreset->decorationPool;
+        newPreset.styleWeights = m_currentPreset->styleWeights;
+    }
+
+    newPreset.edgeEmphasis = m_edgeEmphasisToggle->isToggled();
+    newPreset.flowFollowing = m_flowFollowingToggle->isToggled();
+    newPreset.symmetryMirroring = m_symmetryMirroringToggle->isToggled();
+    newPreset.antiClutterMode = m_antiClutterToggle->isToggled();
+    newPreset.chaosTolerance = m_chaosSlider->getValue();
+    newPreset.symmetryPreference = m_symmetrySlider->getValue();
+    newPreset.microDetailLevel = m_detailSlider->getValue();
+
+    presetManager->addPreset(newPreset);
+    presetManager->saveCustomPresets();
+
+    m_presetNameInput->defocus();
+    m_presetNameInput->removeFromParent();
+    m_presetNameInput = nullptr;
+
+    if (m_confirmSavePresetButton) {
+        m_confirmSavePresetButton->removeFromParent();
+        m_confirmSavePresetButton = nullptr;
+    }
+
+    m_availablePresets = presetManager->getAllPresets();
+    updatePresetDropdown();
+    FLAlertLayer::create("Success", "Preset saved successfully!", "OK")->show();
 }
 
 void AIDecorateLayer::onDensityChanged(CCObject* sender) {
