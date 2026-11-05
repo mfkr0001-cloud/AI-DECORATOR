@@ -6,35 +6,24 @@
 using namespace geode::prelude;
 
 $on_mod(Loaded) {
-    // Initialize preset manager
-    auto presetManager = AutoDecoratorAI::AIPresetManager::get();
-    presetManager->initialize();
-    
+    AutoDecoratorAI::AIPresetManager::get()->initialize();
     log::info("Auto Decorator AI mod loaded successfully!");
 }
 
-class $modify(EditorUI) {
-    AutoDecoratorAI::AIDecorateLayer* m_aiDecorateLayer = nullptr;
-    
+class $modify(AIDecoratorEditorUI, EditorUI) {
+    struct Fields {
+        AutoDecoratorAI::AIDecorateLayer* aiDecorateLayer = nullptr;
+    };
+
     bool init(LevelEditorLayer* editorLayer) {
         if (!EditorUI::init(editorLayer)) {
             return false;
         }
-        
-        // Create AI Decorate layer
-        m_aiDecorateLayer = AutoDecoratorAI::AIDecorateLayer::create(this, editorLayer);
-        if (m_aiDecorateLayer) {
-            this->addChild(m_aiDecorateLayer, 1000);
+
+        m_fields->aiDecorateLayer = AutoDecoratorAI::AIDecorateLayer::create(this, editorLayer);
+        if (m_fields->aiDecorateLayer) {
+            this->addChild(m_fields->aiDecorateLayer, 1000);
         }
-        
         return true;
-    }
-    
-    void destructor() {
-        if (m_aiDecorateLayer) {
-            m_aiDecorateLayer->removeFromParent();
-            m_aiDecorateLayer = nullptr;
-        }
-        EditorUI::destructor();
     }
 };
