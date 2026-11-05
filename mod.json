@@ -2,8 +2,8 @@
 {
     "geode": "5.11.2",
     "gd": {
-        "android": "2.2091",
-        "win": "2.2091"
+        "android": "2.2081",
+        "win": "2.2081"
     },
     "version": "1.0.1",
     "id": "autodecoratorai.reid",
@@ -37,3 +37,4 @@
         ]
     }
 }
+
