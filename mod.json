@@ -11,8 +11,7 @@
     "description": "AI automatic level decoration for Geometry Dash Android",
     "dependencies": [
         {
-            "id": "geode.node-ids",
-            "version": "*"
-        }
-    ]
+    "id": "geode.node-ids",
+    "version": "v1.23.3",
+    "importance": "required"
 }
