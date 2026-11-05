@@ -468,38 +468,28 @@ DecorationObject AIDecorationEngine::selectWeightedObject(const std::vector<Deco
     return pool.back();
 }
 
-void AIDecorationEngine::applyDecorationsToLevel(const std::vector<DecorationPlacement>& placements, LevelEditorLayer* editorLayer) {
-    if (!editorLayer || placements.empty()) {
+void AIDecorationEngine::applyDecorationsToLevel(
+    const std::vector<DecorationPlacement>& placements,
+    EditorUI* editorUI
+) {
+    if (!editorUI || placements.empty()) {
         return;
     }
-    
-    // Batch object creation to prevent frame freezing
-    const int batchSize = 10;
-    for (size_t i = 0; i < placements.size(); i += batchSize) {
-        size_t end = std::min(i + batchSize, placements.size());
-        
-        for (size_t j = i; j < end; ++j) {
-            const auto& placement = placements[j];
-            
-            // Create the object
-            auto obj = GameObject::create(placement.objectID);
-            if (obj) {
-                obj->setPosition(placement.position);
-                obj->setRotation(placement.rotation);
-                obj->setScale(placement.scale);
-                
-                // Add to level
-                editorLayer->addToObjects(obj);
-            }
+
+    // EditorUI::createObject creates the GD object through the editor's own
+    // object pipeline. Direct GameObject::create + LevelEditorLayer insertion
+    // uses APIs that are not available in the current Geode bindings.
+    for (const auto& placement : placements) {
+        auto* object = editorUI->createObject(placement.objectID, placement.position);
+        if (!object) {
+            continue;
         }
-        
-        // Do not sleep on the game thread. Android builds must keep editor
-        // mutations synchronous here; large-level chunking can be added later
-        // with a scheduled cocos2d callback.
+
+        object->setRotation(placement.rotation);
+        object->setScale(placement.scale);
     }
-    
-    // Refresh editor object state after insertion.
-    editorLayer->updateObjects();
+
+    editorUI->reloadUndo();
 }
 
 }
