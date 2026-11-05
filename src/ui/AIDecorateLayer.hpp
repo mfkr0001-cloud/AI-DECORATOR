@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include <Geode/Geode.hpp>
@@ -36,8 +37,9 @@ private:
     AIDecorationEngine* m_decorationEngine = nullptr;
 
     CCMenuItemSpriteExtra* m_toggleButton = nullptr;
-    CCMenu* m_mainMenu = nullptr;
+    CCMenuItemSpriteExtra* m_closeButton = nullptr;
 
+    CCMenu* m_mainMenu = nullptr;
     CCScale9Sprite* m_overlayPanel = nullptr;
 
     CCMenuItemToggler* m_edgeEmphasisToggle = nullptr;
@@ -69,6 +71,8 @@ private:
     std::vector<AIPreset> m_availablePresets;
 
     void onToggle(CCObject* sender);
+    void onClose(CCObject* sender);
+
     void onPresetChanged(CCObject* sender);
     void onAnalyze(CCObject* sender);
     void onApply(CCObject* sender);
