@@ -1,15 +1,17 @@
 #include "AIPresetManager.hpp"
 #include <Geode/Geode.hpp>
 #include <filesystem>
+#include <fstream>
+#include <iterator>
 
-using namespace geode::preload;
+using namespace geode::prelude;
 
 namespace AutoDecoratorAI {
 
 AIPresetManager* AIPresetManager::s_instance = nullptr;
 
 AIPresetManager::AIPresetManager() {
-    m_presetDirectory = (geode::dirs::getModSaveDir() / "AutoDecoratorAI" / "presets").string();
+    m_presetDirectory = (geode::dirs::getModsSaveDir() / "autodecoratorai.reid" / "AutoDecoratorAI" / "presets").string();
 }
 
 AIPresetManager::~AIPresetManager() {}
@@ -311,8 +313,22 @@ std::string AIPresetManager::getPresetFilePath(const std::string& presetId) {
 
 bool AIPresetManager::loadPresetFromFile(const std::string& filePath) {
     try {
-        auto json = matjson::parse(std::filesystem::path(filePath).string());
-        AIPreset preset = AIPreset::fromJson(json);
+        std::ifstream file(filePath);
+        if (!file.is_open()) {
+            return false;
+        }
+
+        std::string contents((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+        auto parsed = matjson::parse(contents);
+        if (!parsed) {
+            log::warn("Failed to parse preset file: {}", filePath);
+            return false;
+        }
+
+        AIPreset preset = AIPreset::fromJson(parsed.unwrap());
+        if (preset.id.empty()) {
+            return false;
+        }
         addPreset(preset);
         return true;
     } catch (const std::exception& e) {
