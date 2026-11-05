@@ -26,7 +26,4 @@ add_subdirectory(
     ${CMAKE_CURRENT_BINARY_DIR}/geode
 )
 
-{
-    "id": "geode.node-ids",
-    "version": "*"
-}
+setup_geode_mod(${PROJECT_NAME} EXTERNALS geode.node-ids:v1.23.3)
