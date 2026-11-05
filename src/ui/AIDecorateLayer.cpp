@@ -1,6 +1,7 @@
 #include "AIDecorateLayer.hpp"
 #include "../presets/AIPresetManager.hpp"
 #include <Geode/Geode.hpp>
+#include <algorithm>
 
 using namespace geode::prelude;
 
@@ -119,7 +120,13 @@ void AIDecorateLayer::createOverlayPanel() {
         return;
     }
 
+    // Keep the original 400x500 layout, but scale it down on small screens.
     panel->setContentSize(CCSize(400, 500));
+    float fitX = (winSize.width - 24.f) / 400.f;
+    float fitY = (winSize.height - 24.f) / 500.f;
+    float panelScale = std::min(1.f, std::min(fitX, fitY));
+    panelScale = std::max(0.55f, panelScale);
+    panel->setScale(panelScale);
 
     panel->setPosition(
         CCPoint(
@@ -138,6 +145,21 @@ void AIDecorateLayer::createOverlayPanel() {
     m_mainMenu->setPosition(CCPoint(0, 0));
 
     panel->addChild(m_mainMenu);
+
+    // Close button uses the same visibility toggle as the toolbar button.
+    auto closeLabel = CCLabelBMFont::create("X", "bigFont.fnt");
+    if (closeLabel) {
+        closeLabel->setScale(0.75f);
+        auto closeButton = CCMenuItemLabel::create(
+            closeLabel,
+            this,
+            menu_selector(AIDecorateLayer::onToggle)
+        );
+        if (closeButton) {
+            closeButton->setPosition(CCPoint(178.f, 228.f));
+            m_mainMenu->addChild(closeButton, 2000);
+        }
+    }
 }
 
 // --------------------------------------------------
@@ -272,7 +294,7 @@ void AIDecorateLayer::createSliders() {
         CCPoint(panelSize.width / 2 + 50, startY)
     );
 
-    m_densitySlider->setScale(0.8f);
+    m_densitySlider->setScale(0.92f);
 
     m_mainMenu->addChild(m_densitySlider);
 
@@ -299,7 +321,7 @@ void AIDecorateLayer::createSliders() {
         CCPoint(panelSize.width / 2 + 50, startY - 40)
     );
 
-    m_chaosSlider->setScale(0.8f);
+    m_chaosSlider->setScale(0.92f);
 
     m_mainMenu->addChild(m_chaosSlider);
 
@@ -326,7 +348,7 @@ void AIDecorateLayer::createSliders() {
         CCPoint(panelSize.width / 2 + 50, startY - 80)
     );
 
-    m_symmetrySlider->setScale(0.8f);
+    m_symmetrySlider->setScale(0.92f);
 
     m_mainMenu->addChild(m_symmetrySlider);
 
@@ -353,7 +375,7 @@ void AIDecorateLayer::createSliders() {
         CCPoint(panelSize.width / 2 + 50, startY - 120)
     );
 
-    m_detailSlider->setScale(0.8f);
+    m_detailSlider->setScale(0.92f);
 
     m_mainMenu->addChild(m_detailSlider);
 }
@@ -389,6 +411,8 @@ void AIDecorateLayer::createToggles() {
             ? m_currentPreset->edgeEmphasis
             : true
     );
+
+    m_edgeEmphasisToggle->setScale(1.15f);
 
     m_mainMenu->addChild(m_edgeEmphasisToggle);
 
@@ -429,6 +453,8 @@ void AIDecorateLayer::createToggles() {
             : true
     );
 
+    m_flowFollowingToggle->setScale(1.15f);
+
     m_mainMenu->addChild(m_flowFollowingToggle);
 
     auto flowLabel = CCLabelBMFont::create(
@@ -468,6 +494,8 @@ void AIDecorateLayer::createToggles() {
             : true
     );
 
+    m_symmetryMirroringToggle->setScale(1.15f);
+
     m_mainMenu->addChild(m_symmetryMirroringToggle);
 
     auto symLabel = CCLabelBMFont::create(
@@ -506,6 +534,8 @@ void AIDecorateLayer::createToggles() {
             ? m_currentPreset->antiClutterMode
             : false
     );
+
+    m_antiClutterToggle->setScale(1.15f);
 
     m_mainMenu->addChild(m_antiClutterToggle);
 
@@ -547,6 +577,8 @@ void AIDecorateLayer::createActionButtons() {
         CCPoint(panelSize.width / 2, startY + 60)
     );
 
+    m_analyzeButton->setScale(1.13f);
+
     m_mainMenu->addChild(m_analyzeButton);
 
     auto applySprite = ButtonSprite::create(
@@ -563,6 +595,8 @@ void AIDecorateLayer::createActionButtons() {
         CCPoint(panelSize.width / 2, startY + 20)
     );
 
+    m_applyButton->setScale(1.13f);
+
     m_mainMenu->addChild(m_applyButton);
 
     auto saveSprite = ButtonSprite::create(
@@ -578,6 +612,8 @@ void AIDecorateLayer::createActionButtons() {
     m_savePresetButton->setPosition(
         CCPoint(panelSize.width / 2, startY - 20)
     );
+
+    m_savePresetButton->setScale(1.13f);
 
     m_mainMenu->addChild(m_savePresetButton);
 }
