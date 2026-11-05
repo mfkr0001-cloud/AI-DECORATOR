@@ -489,7 +489,6 @@ void AIDecorationEngine::applyDecorationsToLevel(
         object->setScale(placement.scale);
     }
 
-    editorUI->reloadUndo();
 }
 
 }
