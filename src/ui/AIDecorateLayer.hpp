@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include <Geode/Geode.hpp>
@@ -11,65 +12,68 @@ namespace AutoDecoratorAI {
 
 class AIDecorateLayer : public cocos2d::CCLayer {
 public:
-    static AIDecorateLayer* create(EditorUI* editorUI, LevelEditorLayer* editorLayer);
-    
+    static AIDecorateLayer* create(
+        EditorUI* editorUI
+    );
+
     void updatePresetDropdown();
-    void updateProgressDisplay(const std::string& status, float progress);
-    
+
+    void updateProgressDisplay(
+        const std::string& status,
+        float progress
+    );
+
 private:
-    bool init(EditorUI* editorUI, LevelEditorLayer* editorLayer);
-    
+    bool init(EditorUI* editorUI);
+
     EditorUI* m_editorUI;
-    LevelEditorLayer* m_editorLayer;
     AIDecorationEngine* m_decorationEngine;
-    
-    // UI Elements
+
     CCMenuItemSpriteExtra* m_toggleButton;
     CCMenu* m_mainMenu;
-    CCScale9Sprite* m_overlayPanel;
-    
+    CCNode* m_overlayPanel;
+
     CCMenuItemToggler* m_edgeEmphasisToggle;
     CCMenuItemToggler* m_flowFollowingToggle;
     CCMenuItemToggler* m_symmetryMirroringToggle;
     CCMenuItemToggler* m_antiClutterToggle;
-    
+
     Slider* m_densitySlider;
     Slider* m_chaosSlider;
     Slider* m_symmetrySlider;
     Slider* m_detailSlider;
-    
+
     CCLabelBMFont* m_presetLabel;
     CCMenu* m_presetMenu;
+
     CCMenuItemSpriteExtra* m_analyzeButton;
     CCMenuItemSpriteExtra* m_applyButton;
     CCMenuItemSpriteExtra* m_savePresetButton;
-    CCMenuItemSpriteExtra* m_confirmSavePresetButton = nullptr;
-    TextInput* m_presetNameInput = nullptr;
-    
+
     CCLabelBMFont* m_progressLabel;
     CCProgressTimer* m_progressBar;
-    
-    // State
+
     bool m_isVisible;
     AIPreset* m_currentPreset;
+
     std::vector<AIPreset> m_availablePresets;
-    
-    // Callbacks
+
     void onToggle(CCObject* sender);
     void onPresetChanged(CCObject* sender);
     void onAnalyze(CCObject* sender);
     void onApply(CCObject* sender);
     void onSavePreset(CCObject* sender);
-    void onConfirmSavePreset(CCObject* sender);
+
     void onDensityChanged(CCObject* sender);
     void onChaosChanged(CCObject* sender);
     void onSymmetryChanged(CCObject* sender);
     void onDetailChanged(CCObject* sender);
+
     void onEdgeEmphasisChanged(CCObject* sender);
     void onFlowFollowingChanged(CCObject* sender);
     void onSymmetryMirroringChanged(CCObject* sender);
     void onAntiClutterChanged(CCObject* sender);
-    
+
     void createOverlayPanel();
     void createToolbarButton();
     void createPresetSelector();
@@ -77,10 +81,10 @@ private:
     void createToggles();
     void createActionButtons();
     void createProgressDisplay();
-    
+
     void showOverlay();
     void hideOverlay();
-    
+
     std::vector<geode::Ref<GameObject>> getSelectedObjects();
 };
 
