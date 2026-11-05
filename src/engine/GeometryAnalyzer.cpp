@@ -27,12 +27,9 @@ std::vector<GeometryCluster> GeometryAnalyzer::analyzeSelection(const std::vecto
         return clusters;
     }
     
-    auto objectClusters = clusterObjectsByProximity(selectedObjects, 150.0f);
-    
-    for (const auto& clusterObjects : objectClusters) {
-        GeometryCluster cluster = classifyCluster(clusterObjects);
-        clusters.push_back(cluster);
-    }
+    // The proximity helper returns a flat list, not a list of clusters.
+    // Analyze the current selection as one coherent cluster for now.
+    clusters.push_back(classifyCluster(selectedObjects));
     
     return clusters;
 }
