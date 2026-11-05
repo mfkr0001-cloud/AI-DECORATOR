@@ -26,7 +26,7 @@ private:
     // UI Elements
     CCMenuItemSpriteExtra* m_toggleButton;
     CCMenu* m_mainMenu;
-    CCNode* m_overlayPanel;
+    CCScale9Sprite* m_overlayPanel;
     
     CCMenuItemToggler* m_edgeEmphasisToggle;
     CCMenuItemToggler* m_flowFollowingToggle;
