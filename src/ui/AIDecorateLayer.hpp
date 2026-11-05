@@ -11,15 +11,16 @@ namespace AutoDecoratorAI {
 
 class AIDecorateLayer : public cocos2d::CCLayer {
 public:
-    static AIDecorateLayer* create(EditorUI* editorUI);
+    static AIDecorateLayer* create(EditorUI* editorUI, LevelEditorLayer* editorLayer);
     
     void updatePresetDropdown();
     void updateProgressDisplay(const std::string& status, float progress);
     
 private:
-    bool init(EditorUI* editorUI);
+    bool init(EditorUI* editorUI, LevelEditorLayer* editorLayer);
     
     EditorUI* m_editorUI;
+    LevelEditorLayer* m_editorLayer;
     AIDecorationEngine* m_decorationEngine;
     
     // UI Elements
