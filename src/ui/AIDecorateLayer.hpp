@@ -43,6 +43,8 @@ private:
     CCMenuItemSpriteExtra* m_analyzeButton;
     CCMenuItemSpriteExtra* m_applyButton;
     CCMenuItemSpriteExtra* m_savePresetButton;
+    CCMenuItemSpriteExtra* m_confirmSavePresetButton = nullptr;
+    TextInput* m_presetNameInput = nullptr;
     
     CCLabelBMFont* m_progressLabel;
     CCProgressTimer* m_progressBar;
@@ -58,6 +60,7 @@ private:
     void onAnalyze(CCObject* sender);
     void onApply(CCObject* sender);
     void onSavePreset(CCObject* sender);
+    void onConfirmSavePreset(CCObject* sender);
     void onDensityChanged(CCObject* sender);
     void onChaosChanged(CCObject* sender);
     void onSymmetryChanged(CCObject* sender);
