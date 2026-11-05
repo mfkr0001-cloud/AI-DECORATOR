@@ -29,7 +29,7 @@ matjson::Value AIPreset::toJson() const {
     json["symmetryMirroring"] = symmetryMirroring;
     json["antiClutterMode"] = antiClutterMode;
     
-    std::vector<matjson::Value> decorationPoolJson;
+    matjson::Value decorationPoolJson;
     for (const auto& obj : decorationPool) {
         matjson::Value objJson;
         objJson["objectID"] = obj.objectID;
@@ -39,7 +39,7 @@ matjson::Value AIPreset::toJson() const {
         objJson["isDetail"] = obj.isDetail;
         decorationPoolJson.push_back(objJson);
     }
-    json["decorationPool"] = matjson::Value(decorationPoolJson);
+    json["decorationPool"] = decorationPoolJson;
     
     matjson::Value styleWeightsJson;
     for (const auto& pair : styleWeights) {
@@ -52,49 +52,49 @@ matjson::Value AIPreset::toJson() const {
 
 AIPreset AIPreset::fromJson(const matjson::Value& json) {
     AIPreset preset;
-
-    preset.id = json["id"].asString().unwrapOr("");
-    preset.name = json["name"].asString().unwrapOr("Imported Preset");
-    preset.description = json["description"].asString().unwrapOr("");
-    preset.styleBias = styleBiasFromString(json["styleBias"].asString().unwrapOr("CleanModern"));
-
+    
+    preset.id = json["id"].asString();
+    preset.name = json["name"].asString();
+    preset.description = json["description"].asString();
+    preset.styleBias = styleBiasFromString(json["styleBias"].asString());
+    
     if (json.contains("densityCurve")) {
-        const auto dc = json["densityCurve"];
-        preset.densityCurve.baseDensity = static_cast<float>(dc["baseDensity"].asDouble().unwrapOr(0.5));
-        preset.densityCurve.edgeMultiplier = static_cast<float>(dc["edgeMultiplier"].asDouble().unwrapOr(1.5));
-        preset.densityCurve.cornerMultiplier = static_cast<float>(dc["cornerMultiplier"].asDouble().unwrapOr(2.0));
-        preset.densityCurve.centerMultiplier = static_cast<float>(dc["centerMultiplier"].asDouble().unwrapOr(0.8));
-        preset.densityCurve.flowMultiplier = static_cast<float>(dc["flowMultiplier"].asDouble().unwrapOr(1.2));
+        auto dc = json["densityCurve"];
+        preset.densityCurve.baseDensity = dc["baseDensity"].asDouble();
+        preset.densityCurve.edgeMultiplier = dc["edgeMultiplier"].asDouble();
+        preset.densityCurve.cornerMultiplier = dc["cornerMultiplier"].asDouble();
+        preset.densityCurve.centerMultiplier = dc["centerMultiplier"].asDouble();
+        preset.densityCurve.flowMultiplier = dc["flowMultiplier"].asDouble();
     }
-
-    preset.symmetryPreference = static_cast<float>(json["symmetryPreference"].asDouble().unwrapOr(0.7));
-    preset.chaosTolerance = static_cast<float>(json["chaosTolerance"].asDouble().unwrapOr(0.3));
-    preset.clusteringThreshold = static_cast<float>(json["clusteringThreshold"].asDouble().unwrapOr(0.5));
-    preset.microDetailLevel = static_cast<float>(json["microDetailLevel"].asDouble().unwrapOr(0.4));
-
-    preset.edgeEmphasis = json["edgeEmphasis"].asBool().unwrapOr(true);
-    preset.flowFollowing = json["flowFollowing"].asBool().unwrapOr(true);
-    preset.symmetryMirroring = json["symmetryMirroring"].asBool().unwrapOr(true);
-    preset.antiClutterMode = json["antiClutterMode"].asBool().unwrapOr(false);
-
-    if (auto array = json["decorationPool"].asArray(); array) {
-        for (const auto& objJson : *array) {
-            DecorationObject obj{};
-            obj.objectID = objJson["objectID"].asInt().unwrapOr(0);
-            obj.weight = static_cast<float>(objJson["weight"].asDouble().unwrapOr(1.0));
-            obj.category = objJson["category"].asString().unwrapOr("detail");
-            obj.requiresGlow = objJson["requiresGlow"].asBool().unwrapOr(false);
-            obj.isDetail = objJson["isDetail"].asBool().unwrapOr(false);
-            preset.decorationPool.push_back(std::move(obj));
+    
+    preset.symmetryPreference = json["symmetryPreference"].asDouble();
+    preset.chaosTolerance = json["chaosTolerance"].asDouble();
+    preset.clusteringThreshold = json["clusteringThreshold"].asDouble();
+    preset.microDetailLevel = json["microDetailLevel"].asDouble();
+    
+    preset.edgeEmphasis = json["edgeEmphasis"].asBool();
+    preset.flowFollowing = json["flowFollowing"].asBool();
+    preset.symmetryMirroring = json["symmetryMirroring"].asBool();
+    preset.antiClutterMode = json["antiClutterMode"].asBool();
+    
+    if (json.contains("decorationPool")) {
+        for (const auto& objJson : json["decorationPool"].asArray()) {
+            DecorationObject obj;
+            obj.objectID = objJson["objectID"].asInt();
+            obj.weight = objJson["weight"].asDouble();
+            obj.category = objJson["category"].asString();
+            obj.requiresGlow = objJson["requiresGlow"].asBool();
+            obj.isDetail = objJson["isDetail"].asBool();
+            preset.decorationPool.push_back(obj);
         }
     }
-
-    if (auto object = json["styleWeights"].asObject(); object) {
-        for (const auto& pair : *object) {
-            preset.styleWeights[pair.first] = static_cast<float>(pair.second.asDouble().unwrapOr(0.0));
+    
+    if (json.contains("styleWeights") && json["styleWeights"].isObject()) {
+        for (const auto& [key, value] : json["styleWeights"]) {
+            preset.styleWeights[key] = value.asDouble().unwrapOr(0.0);
         }
     }
-
+    
     return preset;
 }
 
