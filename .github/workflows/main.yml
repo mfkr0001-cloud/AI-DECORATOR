@@ -1,0 +1,42 @@
+
+name: Build Auto Decorator AI Android
+
+on:
+  push:
+    branches:
+      - "**"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - Android32
+          - Android64
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Geode mod
+        id: build
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          sdk: latest
+          cli: latest
+          target: ${{ matrix.target }}
+          build-config: Release
+          android-min-sdk: 23
+
+      - name: Upload Geode package
+        uses: actions/upload-artifact@v4
+        with:
+          name: Auto-Decorator-AI-${{ matrix.target }}
+          path: ${{ steps.build.outputs.build-output }}/*.geode
+          if-no-files-found: error
+          retention-days: 14
