@@ -468,13 +468,8 @@ DecorationObject AIDecorationEngine::selectWeightedObject(const std::vector<Deco
     return pool.back();
 }
 
-void AIDecorationEngine::applyDecorationsToLevel(const std::vector<DecorationPlacement>& placements, EditorUI* editorUI) {
-    if (!editorUI || placements.empty()) {
-        return;
-    }
-    
-    auto editorLayer = editorUI->getEditorLayer();
-    if (!editorLayer) {
+void AIDecorationEngine::applyDecorationsToLevel(const std::vector<DecorationPlacement>& placements, LevelEditorLayer* editorLayer) {
+    if (!editorLayer || placements.empty()) {
         return;
     }
     
@@ -486,15 +481,15 @@ void AIDecorationEngine::applyDecorationsToLevel(const std::vector<DecorationPla
         for (size_t j = i; j < end; ++j) {
             const auto& placement = placements[j];
             
-            // Create and register the object through the editor layer.
-            auto obj = editorLayer->createObject(
-                placement.objectID,
-                placement.position,
-                false
-            );
+            // Create the object
+            auto obj = GameObject::create(placement.objectID);
             if (obj) {
+                obj->setPosition(placement.position);
                 obj->setRotation(placement.rotation);
                 obj->setScale(placement.scale);
+                
+                // Add to level
+                editorLayer->addToObjects(obj);
             }
         }
         
@@ -503,8 +498,8 @@ void AIDecorationEngine::applyDecorationsToLevel(const std::vector<DecorationPla
         // with a scheduled cocos2d callback.
     }
     
-    // Refresh editor
-    editorUI->reloadUndo();
+    // Refresh editor object state after insertion.
+    editorLayer->updateObjects();
 }
 
 }
